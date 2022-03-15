@@ -4,7 +4,7 @@ A content management system boss using react
 
 ## Technology stack
 
-Vite@2.8 + react@17.0 + typescript@4.5 + antd@4.19
+Vite@2.8 + react@17.0 + typescript@4.5 + antd@4.19 + styled-components@5.3
 
 ## Usage
 
