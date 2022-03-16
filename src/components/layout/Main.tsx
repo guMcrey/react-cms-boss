@@ -1,22 +1,13 @@
 import React from 'react'
-import styled from 'styled-components'
+import { Layout } from 'antd'
 
-const Main = () => {
-    return (
-        <MainWrapper>
-           <div className="wrapper-title">Hello Hakuna,</div>
-           <div>This is what we've got for you today.</div>
-        </MainWrapper>
-    )
+const { Content } = Layout
+
+export const Main = () => {
+  return (
+    <Content className="content-area">
+      <div className="wrapper-title">Hello Hakuna,</div>
+      <div>This is what we've got for you today.</div>
+    </Content>
+  )
 }
-
-export {
-    Main
-}
-
-const MainWrapper = styled.div`
-  .wrapper-title {
-      font-size: 22px;
-      font-weight: bold;
-  }
-`
