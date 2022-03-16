@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { Menu, Dropdown, Layout } from 'antd'
 import {
   UserOutlined,
@@ -14,13 +15,13 @@ const menu = (
   <div>
     <Menu>
       <Menu.Item key="profile" icon={<UserOutlined />}>
-        <a href="#">Profile</a>
+        <Link to="profile">Profile</Link>
       </Menu.Item>
       <Menu.Item key="settings" icon={<SettingOutlined />}>
-        <a href="#">Settings</a>
+        <Link to="settings">Settings</Link>
       </Menu.Item>
       <Menu.Item key="logout" icon={<LogoutOutlined />}>
-        <a href="#">Logout</a>
+        <Link to="logout">Logout</Link>
       </Menu.Item>
     </Menu>
   </div>
