@@ -10,7 +10,7 @@ import { Settings } from '@/views/settings/Index'
 import { Logout } from '@/views/logout/Index'
 
 import './assets/styles/reset.css'
-import 'antd/dist/antd.css'
+import 'antd/dist/antd.variable.min.css'
 
 ReactDOM.render(
   <React.StrictMode>
