@@ -79,7 +79,7 @@ const LayoutWrapper = styled.div`
     margin: 0 10px 10px 0;
     background-color: #f4f4f4;
     border-radius: 0 0 25px 0;
-    padding: 20px;
+    padding: 15px;
   }
   .layout-wrapper-container {
     background-color: #fff;

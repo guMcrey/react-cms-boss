@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { App } from './App'
 import { Dashboard } from '@/views/dashboard/Index'
 import { ArticleList } from '@/views/article/ArticleList'
+import { CreateArticle } from '@/views/article/CreateArticle'
 import { ArticleAnalysis } from '@/views/article/ArticleAnalysis'
 import { Profile } from '@/views/profile/Index'
 import { Settings } from '@/views/settings/Index'
@@ -19,6 +20,7 @@ ReactDOM.render(
         <Route path="/" element={<App />}>
           <Route path="/" element={<Dashboard />}></Route>
           <Route path="articles" element={<ArticleList />}></Route>
+          <Route path="article-create" element={<CreateArticle />}></Route>
           <Route path="article-analysis" element={<ArticleAnalysis />}></Route>
           <Route path="profile" element={<Profile />}></Route>
           <Route path="settings" element={<Settings />}></Route>
