@@ -14,6 +14,17 @@ export const useGetArticles = () => {
   }
 }
 
+// get article by id
+export const useGetArticleDetailById = (id: string) => {
+  const { data, error } = useSWR(`/api/articles/${id}`, fetcher)
+
+  return {
+    articleInfo: data && data.result,
+    isLoading: !error && !data,
+    isError: error,
+  }
+}
+
 // create article
 export const requestCreateArticle = async (form: any) => {
   let result = undefined
@@ -35,4 +46,15 @@ export const requestCreateArticle = async (form: any) => {
   }
 
   return result
+}
+
+// delete article
+export const deleteArticle = async (id: string) => {
+  let result = undefined
+  try {
+    const { data } = await axios.delete(`/articles/${id}`)
+    result = data
+  } catch (e) {
+    console.warn(e)
+  }
 }

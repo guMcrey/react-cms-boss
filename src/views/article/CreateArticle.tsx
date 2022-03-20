@@ -1,11 +1,32 @@
 import { Button, Card, DatePicker, Form, Input, message, Space } from 'antd'
 import { requestCreateArticle } from '@/apis/article/useArticle'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useGetArticleDetailById } from '@/apis/article/useArticle'
 
 export const CreateArticle = () => {
   const navigate = useNavigate()
   const { TextArea } = Input
   const [form] = Form.useForm()
+  let [params] = useSearchParams()
+  const currentId = params.get('id')
+
+  if (currentId) {
+    const { articleInfo, isLoading } = useGetArticleDetailById(currentId)
+    if (articleInfo && articleInfo.length) {
+      const { title, author, url, main_img, description, content, publish_time, publish_status, tag } = articleInfo[0]
+      form.setFieldsValue({
+        title,
+        url,
+        author,
+        mainPicture: main_img,
+        description,
+        content,
+        // publishTime: publish_time,
+        publishStatus: publish_status,
+        tag,
+      })
+    }
+  }
 
   const layout = {
     labelCol: { span: 2 },
@@ -29,6 +50,9 @@ export const CreateArticle = () => {
       <Form {...layout} form={form} onFinish={onFinish}>
         <Form.Item label="Title" name="title" rules={[{ required: true }]}>
           <Input placeholder="HTML Basic" />
+        </Form.Item>
+        <Form.Item label="Author" name="author">
+          <Input />
         </Form.Item>
         <Form.Item label="URL" name="url">
           <Input placeholder="/html-basic" />
