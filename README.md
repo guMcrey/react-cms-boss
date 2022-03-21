@@ -16,6 +16,6 @@ $ npm install
 $ npm run dev
 ```
 
-## Backend Project
+## Backend project
 
 github: [node-cms-server](https://github.com/guMcrey/node-cms-server)

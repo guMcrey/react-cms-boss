@@ -1,7 +1,7 @@
 import { Button, Card, DatePicker, Form, Input, message, Space } from 'antd'
-import { requestCreateArticle } from '@/apis/article/useArticle'
+import { createArticle } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useGetArticleDetailById } from '@/apis/article/useArticle'
+import { useGetArticleDetailById, updateArticle } from '@/apis/article'
 
 export const CreateArticle = () => {
   const navigate = useNavigate()
@@ -38,10 +38,23 @@ export const CreateArticle = () => {
   }
 
   const onFinish = async (values: any) => {
-    const result = await requestCreateArticle(values)
-    if (result !== undefined) {
-      message.success('Create success')
-      navigate('/articles')
+    // edit
+    if (currentId) {
+      const result = await updateArticle(currentId, values)
+      if (result !== undefined) {
+        message.success('Update success')
+        navigate('/articles')
+      }
+      return
+    }
+    // create
+    if (!currentId) {
+      const result = await createArticle(values)
+      if (result !== undefined) {
+        message.success('Create success')
+        navigate('/articles')
+      }
+      return
     }
   }
 
