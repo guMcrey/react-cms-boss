@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Button, Card, DatePicker, Form, Input, message, Space } from 'antd'
 import { createArticle } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -6,7 +6,6 @@ import { useGetArticleDetailById, updateArticle } from '@/apis/article'
 import { IArticleItem } from '@/interfaces/article'
 
 export const CreateArticle = () => {
-  const [count, setCount] = useState(0)
   const navigate = useNavigate()
   const { TextArea } = Input
   const [form] = Form.useForm()
