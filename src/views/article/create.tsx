@@ -1,32 +1,18 @@
+import React, { useState, useEffect } from 'react'
 import { Button, Card, DatePicker, Form, Input, message, Space } from 'antd'
 import { createArticle } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetArticleDetailById, updateArticle } from '@/apis/article'
+import { IArticleItem } from '@/interfaces/article'
 
 export const CreateArticle = () => {
+  const [count, setCount] = useState(0)
   const navigate = useNavigate()
   const { TextArea } = Input
   const [form] = Form.useForm()
   let [params] = useSearchParams()
   const currentId = params.get('id')
-
-  if (currentId) {
-    const { articleInfo, isLoading } = useGetArticleDetailById(currentId)
-    if (articleInfo && articleInfo.length) {
-      const { title, author, url, main_img, description, content, publish_time, publish_status, tag } = articleInfo[0]
-      form.setFieldsValue({
-        title,
-        url,
-        author,
-        mainPicture: main_img,
-        description,
-        content,
-        // publishTime: publish_time,
-        publishStatus: publish_status,
-        tag,
-      })
-    }
-  }
+  const { articleInfo, isLoading } = useGetArticleDetailById(currentId)
 
   const layout = {
     labelCol: { span: 2 },
@@ -37,7 +23,7 @@ export const CreateArticle = () => {
     wrapperCol: { offset: 2, span: 16 },
   }
 
-  const onFinish = async (values: any) => {
+  const onFinish = async (values: IArticleItem) => {
     // edit
     if (currentId) {
       const result = await updateArticle(currentId, values)
@@ -57,6 +43,27 @@ export const CreateArticle = () => {
       return
     }
   }
+
+  const onReset = () => {
+    form.resetFields()
+  }
+
+  useEffect(() => {
+    if (articleInfo && articleInfo.length) {
+      const { title, author, url, main_img, description, content, publish_time, publish_status, tag } = articleInfo[0]
+      form.setFieldsValue({
+        title,
+        url,
+        author,
+        mainPicture: main_img,
+        description,
+        content,
+        // publishTime: publish_time,
+        publishStatus: publish_status,
+        tag,
+      })
+    }
+  }, [articleInfo])
 
   return (
     <Card title="Create Article">
@@ -94,7 +101,7 @@ export const CreateArticle = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button>Reset</Button>
+            <Button onClick={onReset}>Reset</Button>
           </Space>
         </Form.Item>
       </Form>

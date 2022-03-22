@@ -1,12 +1,13 @@
 import useSWR from 'swr'
 import { axios } from '@/utils/axios'
+import { IArticleCreate, IArticleQuery } from '@/interfaces/article'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const queryFetcher = (url: string, query?: IArticleQuery) => axios.get(url, { params: query }).then((data) => data.data)
 
 // get article list
-export const useGetArticles = () => {
-  const { data, error, mutate } = useSWR(`/api/articles`, fetcher)
-
+export const useGetArticles = (query?: IArticleQuery) => {
+  const { data, error, mutate } = useSWR([`/articles`, query], queryFetcher)
   return {
     articleList: data && data.result,
     isLoading: !error && !data,
@@ -16,8 +17,8 @@ export const useGetArticles = () => {
 }
 
 // get article by id
-export const useGetArticleDetailById = (id: string) => {
-  const { data, error } = useSWR(`/api/articles/${id}`, fetcher)
+export const useGetArticleDetailById = (id?: string | null) => {
+  const { data, error } = useSWR(id ? `/api/articles/${id}` : null, fetcher)
 
   return {
     articleInfo: data && data.result,
@@ -27,7 +28,7 @@ export const useGetArticleDetailById = (id: string) => {
 }
 
 // create article
-export const createArticle = async (form: any) => {
+export const createArticle = async (form: IArticleCreate) => {
   let result = undefined
   try {
     const { title, author, url, content, description, mainPicture, publishStatus, publishTime, tag } = form
@@ -51,7 +52,7 @@ export const createArticle = async (form: any) => {
 }
 
 // update article info
-export const updateArticle = async (id: string, form: any) => {
+export const updateArticle = async (id: string, form: IArticleCreate) => {
   let result = undefined
   try {
     const { title, author, url, content, description, mainPicture, publishStatus, publishTime, tag } = form
