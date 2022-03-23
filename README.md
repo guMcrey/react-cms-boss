@@ -5,7 +5,7 @@ A content management system boss using react
 
 ## Technology stack
 
-Vite@2.8 + react@17.0 + react-router@6.2 + typescript@4.5 + axios@0.26 + swr@1.2 + antd@4.19 + styled-components@5.3
+vite@2.8 + react@17.0 + react-router@6.2 + typescript@4.5 + axios@0.26 + swr@1.2 + antd@4.19 + styled-components@5.3
 
 ## Usage
 
