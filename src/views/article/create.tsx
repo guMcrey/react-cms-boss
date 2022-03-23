@@ -94,6 +94,7 @@ export const CreateArticle = () => {
     const tagElem = (
       <Tag
         closable
+        color="geekblue"
         onClose={(e) => {
           e.preventDefault()
           handleTagClose(tag)
@@ -226,7 +227,7 @@ export const CreateArticle = () => {
             <Input style={{ width: 100 }} type="text" onChange={handleInputChange} onPressEnter={handleInputConfirm} />
           )}
           {!tagInputVisible && (
-            <Tag onClick={() => setTagInputVisible(true)}>
+            <Tag color="#4047F4" onClick={() => setTagInputVisible(true)}>
               <PlusOutlined />
               &nbsp;New Tag
             </Tag>
