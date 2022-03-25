@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Card, DatePicker, Form, Input, message, Select, Space, Tag, Upload } from 'antd'
-import { createArticle } from '@/apis/article'
+import { createArticle, uploadArticleMainPicture } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetArticleDetailById, updateArticle } from '@/apis/article'
 import { IArticleCreate } from '@/interfaces/article'
@@ -13,7 +13,7 @@ const { Option } = Select
 export const CreateArticle = () => {
   const [username, setUsername] = useState('hakuna')
   const [editUsernameVisible, setEditUsernameVisible] = useState(false)
-  const [fileList, setFileList] = useState([])
+  const [fileList, setFileList]: any = useState()
   const [tagInputVisible, setTagInputVisible] = useState(false)
   const [tags, setTags] = useState([])
   const [tagInputValue, setTagInputValue] = useState(undefined)
@@ -37,13 +37,10 @@ export const CreateArticle = () => {
 
   const mainPictureProps: any = {
     onRemove: (file: never) => {
-      const index = fileList.indexOf(file)
-      const newFileList = fileList.slice()
-      newFileList.splice(index, 1)
-      return setFileList(newFileList)
+      return setFileList(null)
     },
     beforeUpload: (file: never) => {
-      setFileList([...fileList, file])
+      setFileList(file)
       return false
     },
   }
@@ -65,11 +62,6 @@ export const CreateArticle = () => {
   }
 
   const generateSlugHandler = () => {
-    // TODO:
-  }
-
-  const handleUpload = () => {
-    const formData = new FormData()
     // TODO:
   }
 
@@ -110,7 +102,6 @@ export const CreateArticle = () => {
   const tagChild = tags.map(forMap)
 
   const onFinish = async (values: IArticleCreate) => {
-    console.log(values)
     const { title, url, content, description, publishStatus, publishTime } = values
     const body = {
       title,
@@ -123,13 +114,11 @@ export const CreateArticle = () => {
       publishTime: moment(publishTime).format('YYYY-MM-DD HH:mm:ss'),
       tag: tags,
     }
-    console.log('body', body)
-    // TODO:
-    return
+
     setSubmitLoading(true)
     // edit
     if (currentId) {
-      const result = await updateArticle(currentId, values)
+      const result = await updateArticle(currentId, body)
       if (result !== undefined) {
         message.success('Update success')
         navigate('/articles')
@@ -138,7 +127,19 @@ export const CreateArticle = () => {
     }
     // create
     if (!currentId) {
-      const result = await createArticle(values)
+      const result = await createArticle(body)
+
+      // 上传 main img
+      if (fileList) {
+        const formDataBody = new FormData()
+        formDataBody.append('main_img', fileList)
+        const uploadResult = await uploadArticleMainPicture(result.articleId, formDataBody)
+        if (!uploadResult.filename) {
+          message.error('Create failed')
+          return
+        }
+      }
+
       if (result !== undefined) {
         message.success('Create success')
         navigate('/articles')
@@ -202,7 +203,7 @@ export const CreateArticle = () => {
           <Input placeholder="e.g. html-basic" />
         </Form.Item>
         <Form.Item label="Main Picture">
-          <Upload listType="picture" {...mainPictureProps}>
+          <Upload listType="picture" {...mainPictureProps} maxCount={1}>
             <Button icon={<UploadOutlined />}>Select main picture</Button>
           </Upload>
         </Form.Item>

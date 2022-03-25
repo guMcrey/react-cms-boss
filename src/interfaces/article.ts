@@ -16,7 +16,7 @@ export interface IArticleTag {
 }
 
 export interface IArticleCreate {
-  title?: string
+  title: string
   author?: string
   url?: string
   content?: string

@@ -31,13 +31,12 @@ export const useGetArticleDetailById = (id?: string | null) => {
 export const createArticle = async (form: IArticleCreate) => {
   let result = undefined
   try {
-    const { title, author, url, content, description, mainPicture, publishStatus, publishTime, tag } = form
+    const { title, author, url, content, description, publishStatus, publishTime, tag } = form
     const { data } = await axios.post('/articles', {
       title,
       url,
       content,
       description,
-      main_img: mainPicture,
       publish_status: publishStatus,
       publish_time: publishTime,
       tag,
@@ -86,4 +85,19 @@ export const deleteArticle = async (id: string) => {
   }
 
   return result
+}
+
+// upload article main picture
+export const uploadArticleMainPicture = async (articleId: string, img: FormData) => {
+  let uploadResult = undefined
+  try {
+    const { data } = await axios.put(`/upload/article-img/${articleId}`, img, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    uploadResult = data
+  } catch (e) {
+    console.warn(e)
+  }
+
+  return uploadResult
 }
