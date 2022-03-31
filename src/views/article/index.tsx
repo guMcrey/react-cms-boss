@@ -5,6 +5,7 @@ import { useGetArticles, deleteArticle } from '@/apis/article'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 
 import { IArticleItem, IArticleQuery } from '@/interfaces/article'
+import { debounce } from '@/utils/function'
 
 const { Column } = Table
 const { Option } = Select
@@ -30,16 +31,6 @@ export const ArticleList = () => {
     await deleteArticle(item.article_id)
     message.success('Delete success')
     mutate()
-  }
-
-  // debounce: wait 1s
-  const debounce = (func: () => void, wait: number) => {
-    let timer = setTimeout(() => '', 1000)
-
-    return () => {
-      clearTimeout(timer)
-      timer = setTimeout(func, wait)
-    }
   }
 
   const onChangeQuery = () => {

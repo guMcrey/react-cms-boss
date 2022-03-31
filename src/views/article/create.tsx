@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Card, DatePicker, Form, Input, message, Select, Space, Tag, Upload } from 'antd'
+import { Button, Card, DatePicker, Form, Input, message, Radio, Select, Space, Tag, Tooltip, Upload } from 'antd'
 import { createArticle, uploadArticleMainPicture } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useGetArticleDetailById, updateArticle } from '@/apis/article'
 import { IArticleCreate } from '@/interfaces/article'
-import { EditOutlined, CheckOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons'
+import { EditOutlined, CheckOutlined, UploadOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import moment from 'moment'
+import { convertToUrl, debounce } from '@/utils/function'
+import ClipboardJS from 'clipboard'
 
+new ClipboardJS('#slugBtn')
 const { Option } = Select
 
 export const CreateArticle = () => {
   const [username, setUsername] = useState('hakuna')
   const [editUsernameVisible, setEditUsernameVisible] = useState(false)
+  const [slugOptionValue, setSlugOptionValue] = useState('automatic')
+  const [isCopied, setCopied] = useState(false)
   const [fileList, setFileList]: any = useState()
   const [tagInputVisible, setTagInputVisible] = useState(false)
   const [tags, setTags] = useState([])
@@ -34,6 +39,11 @@ export const CreateArticle = () => {
   const tailLayout = {
     wrapperCol: { offset: 2, span: 16 },
   }
+
+  const slugOptions = [
+    { label: 'Automatic generate', value: 'automatic' },
+    { label: 'Input by self', value: 'inputBySelf' },
+  ]
 
   const mainPictureProps: any = {
     onRemove: (file: never) => {
@@ -61,8 +71,15 @@ export const CreateArticle = () => {
     setUsername(form.getFieldValue('author'))
   }
 
-  const generateSlugHandler = () => {
-    // TODO:
+  const generateSlugHandler = (e: any): void => {
+    if (slugOptionValue === 'inputBySelf') {
+      return
+    }
+    form.setFieldsValue({ url: convertToUrl(e.target.value.trim()) })
+  }
+
+  const onChangeSlugOption = (e: any) => {
+    setSlugOptionValue(e.target.value)
   }
 
   const handleInputChange = (e: any) => {
@@ -179,7 +196,7 @@ export const CreateArticle = () => {
         onFinish={onFinish}
       >
         <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-          <Input placeholder="e.g. HTML Basic" onChange={generateSlugHandler} />
+          <Input placeholder="e.g. HTML Basic" onChange={debounce(generateSlugHandler, 1000)} />
         </Form.Item>
         <Form.Item label="Author">
           {!editUsernameVisible && (
@@ -199,8 +216,44 @@ export const CreateArticle = () => {
             </CreateWrapper>
           )}
         </Form.Item>
-        <Form.Item label="Slug" name="url">
-          <Input placeholder="e.g. html-basic" />
+        <Form.Item style={{ marginTop: -20 }} label="Slug">
+          <Radio.Group options={slugOptions} onChange={onChangeSlugOption} value={slugOptionValue} optionType="button" />
+          <Form.Item
+            name="url"
+            style={{ width: 'calc(100% - 34px)', position: 'relative' }}
+            rules={[
+              {
+                validator: (rule, value, callback) => {
+                  const regExp = new RegExp('^[A-Za-z0-9-]+$')
+                  if (!regExp.test(value)) {
+                    callback('Only letters, numbers and dashes are allowed')
+                  }
+                },
+              },
+            ]}
+          >
+            <Input id="slug" placeholder="e.g. html-basic" />
+          </Form.Item>
+          {!isCopied && (
+            <ToolTipsWrapper title="">
+              <Button
+                id="slugBtn"
+                data-clipboard-target="#slug"
+                icon={<CopyOutlined />}
+                onClick={() => {
+                  setTimeout(() => {
+                    setCopied(false)
+                  }, 2000)
+                  setCopied(true)
+                }}
+              />
+            </ToolTipsWrapper>
+          )}
+          {isCopied && (
+            <ToolTipsWrapper defaultVisible title="copied!">
+              <Button icon={<CheckOutlined style={{ color: '#4047F4' }} />}></Button>
+            </ToolTipsWrapper>
+          )}
         </Form.Item>
         <Form.Item label="Main Picture">
           <Upload listType="picture" {...mainPictureProps} maxCount={1}>
@@ -253,4 +306,18 @@ const CreateWrapper = styled.div`
     width: 100%;
     margin-right: 7px;
   }
+`
+
+// TODO:
+const RadioWrapper = styled(Radio)`
+  border-bottom: none;
+  .ant-radio-button-wrapper {
+    border-bottom: none;
+  }
+`
+
+const ToolTipsWrapper = styled(Tooltip)`
+  position: absolute;
+  right: 3px;
+  top: 32px;
 `
