@@ -216,8 +216,8 @@ export const CreateArticle = () => {
             </CreateWrapper>
           )}
         </Form.Item>
-        <Form.Item style={{ marginTop: -20 }} label="Slug">
-          <Radio.Group options={slugOptions} onChange={onChangeSlugOption} value={slugOptionValue} optionType="button" />
+        <Form.Item style={{ margin: '-20px 0 0' }} label="Slug">
+          <RadioWrapper options={slugOptions} onChange={onChangeSlugOption} value={slugOptionValue} optionType="button" />
           <Form.Item
             name="url"
             style={{ width: 'calc(100% - 34px)', position: 'relative' }}
@@ -308,9 +308,7 @@ const CreateWrapper = styled.div`
   }
 `
 
-// TODO:
-const RadioWrapper = styled(Radio)`
-  border-bottom: none;
+const RadioWrapper = styled(Radio.Group)`
   .ant-radio-button-wrapper {
     border-bottom: none;
   }
