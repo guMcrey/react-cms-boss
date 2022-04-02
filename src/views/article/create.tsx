@@ -31,15 +31,6 @@ export const CreateArticle = () => {
   const currentId = params.get('id')
   const { articleInfo, isLoading } = useGetArticleDetailById(currentId)
 
-  const layout = {
-    labelCol: { span: 2 },
-    wrapperCol: { span: 24 },
-  }
-
-  const tailLayout = {
-    wrapperCol: { offset: 2, span: 16 },
-  }
-
   const slugOptions = [
     { label: 'Automatic generate', value: 'automatic' },
     { label: 'Input by self', value: 'inputBySelf' },
@@ -188,23 +179,23 @@ export const CreateArticle = () => {
   }, [articleInfo])
 
   return (
-    <Card title="Create Article">
+    <Card title="Variables">
       <Form
-        {...layout}
+        layout="vertical"
         initialValues={{ publishTime: moment(new Date(), 'YYYY-MM-DD HH:mm:ss') }}
         form={form}
         onFinish={onFinish}
       >
-        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+        <Form.Item label="Title:" name="title" rules={[{ required: true }]}>
           <Input placeholder="e.g. HTML Basic" onChange={debounce(generateSlugHandler, 1000)} />
         </Form.Item>
-        <Form.Item label="Author">
+        <Form.Item label="Author:">
           {!editUsernameVisible && (
             <CreateWrapper>
               <Form.Item name="author">
                 <span style={{ marginRight: 8 }}>{username}</span>
               </Form.Item>
-              <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={handleEditAuthor} />
+              <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={handleEditAuthor} size="small" />
             </CreateWrapper>
           )}
           {editUsernameVisible && (
@@ -212,12 +203,18 @@ export const CreateArticle = () => {
               <Form.Item name="author" className="author-input">
                 <Input placeholder="Author" onPressEnter={handleChangeAuthor} />
               </Form.Item>
-              <Button type="primary" shape="circle" icon={<CheckOutlined />} onClick={handleChangeAuthor} />
+              <Button type="primary" shape="circle" icon={<CheckOutlined />} onClick={handleChangeAuthor} size="small" />
             </CreateWrapper>
           )}
         </Form.Item>
         <Form.Item style={{ margin: '-20px 0 0' }} label="Slug">
-          <RadioWrapper options={slugOptions} onChange={onChangeSlugOption} value={slugOptionValue} optionType="button" />
+          <RadioWrapper
+            options={slugOptions}
+            onChange={onChangeSlugOption}
+            value={slugOptionValue}
+            optionType="button"
+            size="small"
+          />
           <Form.Item
             name="url"
             style={{ width: 'calc(100% - 34px)', position: 'relative' }}
@@ -261,10 +258,7 @@ export const CreateArticle = () => {
           </Upload>
         </Form.Item>
         <Form.Item label="Description" name="description">
-          <TextArea showCount maxLength={500} rows={4} placeholder="Please enter article description..." />
-        </Form.Item>
-        <Form.Item label="Content" name="content">
-          <TextArea rows={4} placeholder="Please enter article content..." />
+          <TextArea showCount maxLength={500} rows={3} placeholder="Please enter article description..." />
         </Form.Item>
         <Form.Item label="Publish time" name="publishTime">
           <DatePicker showTime style={{ width: '100%' }} placeholder="Select publish time" />
@@ -287,21 +281,22 @@ export const CreateArticle = () => {
             </Tag>
           )}
         </Form.Item>
-        <Form.Item {...tailLayout}>
-          <Space>
-            <Button type="primary" htmlType="submit" loading={submitLoading}>
-              Submit
-            </Button>
-            <Button onClick={onReset}>Reset</Button>
-          </Space>
-        </Form.Item>
       </Form>
+      <BtnWrapper>
+        <Button onClick={onReset} block>
+          Save to draft
+        </Button>
+        <Button type="primary" htmlType="submit" loading={submitLoading} block>
+          Publish
+        </Button>
+      </BtnWrapper>
     </Card>
   )
 }
 
 const CreateWrapper = styled.div`
   display: flex;
+  align-items: baseline;
   .author-input {
     width: 100%;
     margin-right: 7px;
@@ -317,5 +312,14 @@ const RadioWrapper = styled(Radio.Group)`
 const ToolTipsWrapper = styled(Tooltip)`
   position: absolute;
   right: 3px;
-  top: 32px;
+  top: 24px;
+`
+
+const BtnWrapper = styled.div`
+  display: flex;
+  border-top: 1px dashed #ececec;
+  padding: 20px 0px 10px;
+  Button:last-child {
+    margin-left: 5px;
+  }
 `

@@ -5,6 +5,7 @@ import { App } from './App'
 import { Dashboard } from '@/views/dashboard/index'
 import { ArticleList } from '@/views/article/index'
 import { CreateArticle } from '@/views/article/create'
+import { CreateArticleEditor } from '@/views/article/create-editor'
 import { ArticleAnalysis } from '@/views/article/article-analysis'
 import { Profile } from '@/views/profile/index'
 import { Settings } from '@/views/settings/index'
@@ -21,6 +22,7 @@ ReactDOM.render(
           <Route path="/" element={<Dashboard />}></Route>
           <Route path="articles" element={<ArticleList />}></Route>
           <Route path="article-create" element={<CreateArticle />}></Route>
+          <Route path="article-editor" element={<CreateArticleEditor />}></Route>
           <Route path="article-analysis" element={<ArticleAnalysis />}></Route>
           <Route path="profile" element={<Profile />}></Route>
           <Route path="settings" element={<Settings />}></Route>
