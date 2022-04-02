@@ -13,7 +13,12 @@ import ClipboardJS from 'clipboard'
 new ClipboardJS('#slugBtn')
 const { Option } = Select
 
-export const CreateArticle = () => {
+interface IProps {
+  title: string
+  description: string
+}
+
+export const CreateArticle = (props: Partial<IProps>) => {
   const [username, setUsername] = useState('hakuna')
   const [editUsernameVisible, setEditUsernameVisible] = useState(false)
   const [slugOptionValue, setSlugOptionValue] = useState('automatic')
@@ -62,11 +67,11 @@ export const CreateArticle = () => {
     setUsername(form.getFieldValue('author'))
   }
 
-  const generateSlugHandler = (e: any): void => {
+  const generateSlugHandler = (): void => {
     if (slugOptionValue === 'inputBySelf') {
       return
     }
-    form.setFieldsValue({ url: convertToUrl(e.target.value.trim()) })
+    form.setFieldsValue({ url: convertToUrl(props.title ? props.title.trim() : '') })
   }
 
   const onChangeSlugOption = (e: any) => {
@@ -109,8 +114,8 @@ export const CreateArticle = () => {
 
   const tagChild = tags.map(forMap)
 
-  const onFinish = async (values: IArticleCreate) => {
-    const { title, url, content, description, publishStatus, publishTime } = values
+  const onFinish = async (values: IArticleCreate, publishType: string) => {
+    const { title, url, content, description, publishTime } = values
     const body = {
       title,
       url,
@@ -118,7 +123,7 @@ export const CreateArticle = () => {
       content,
       description,
       mainPicture: fileList,
-      publishStatus,
+      publishStatus: publishType,
       publishTime: moment(publishTime).format('YYYY-MM-DD HH:mm:ss'),
       tag: tags,
     }
@@ -157,10 +162,6 @@ export const CreateArticle = () => {
     setSubmitLoading(false)
   }
 
-  const onReset = () => {
-    form.resetFields()
-  }
-
   useEffect(() => {
     if (articleInfo && articleInfo.length) {
       const { title, author, url, main_img, description, content, publish_time, publish_status, tag } = articleInfo[0]
@@ -172,22 +173,31 @@ export const CreateArticle = () => {
         description,
         content,
         // publishTime: publish_time,
-        publishStatus: publish_status,
+        // publishStatus: publish_status,
         tag,
       })
     }
   }, [articleInfo])
 
+  useEffect(() => {
+    form.setFieldsValue({
+      title: props.title,
+    })
+    generateSlugHandler()
+  }, [props.title])
+
+  useEffect(() => {
+    const descriptionDisplay = props.description ? props.description.slice(0, 300) : ''
+    form.setFieldsValue({
+      description: descriptionDisplay,
+    })
+  }, [props.description])
+
   return (
     <Card title="Variables">
-      <Form
-        layout="vertical"
-        initialValues={{ publishTime: moment(new Date(), 'YYYY-MM-DD HH:mm:ss') }}
-        form={form}
-        onFinish={onFinish}
-      >
+      <Form layout="vertical" initialValues={{ publishTime: moment(new Date(), 'YYYY-MM-DD HH:mm:ss') }} form={form}>
         <Form.Item label="Title:" name="title" rules={[{ required: true }]}>
-          <Input placeholder="e.g. HTML Basic" onChange={debounce(generateSlugHandler, 1000)} />
+          <Input placeholder="e.g. HTML Basic" readOnly />
         </Form.Item>
         <Form.Item label="Author:">
           {!editUsernameVisible && (
@@ -258,16 +268,10 @@ export const CreateArticle = () => {
           </Upload>
         </Form.Item>
         <Form.Item label="Description" name="description">
-          <TextArea showCount maxLength={500} rows={3} placeholder="Please enter article description..." />
+          <TextArea showCount maxLength={300} rows={3} placeholder="Please enter article description..." />
         </Form.Item>
         <Form.Item label="Publish time" name="publishTime">
           <DatePicker showTime style={{ width: '100%' }} placeholder="Select publish time" />
-        </Form.Item>
-        <Form.Item label="Publish status" name="publishStatus">
-          <Select placeholder="Select publish status">
-            <Option value="published">Publish</Option>
-            <Option value="to draft">Save to draft</Option>
-          </Select>
         </Form.Item>
         <Form.Item label="Tag">
           {tagChild}
@@ -281,15 +285,15 @@ export const CreateArticle = () => {
             </Tag>
           )}
         </Form.Item>
+        <BtnWrapper>
+          <Button onClick={() => onFinish(form.getFieldsValue(), 'saveToDraft')} block>
+            Save to draft
+          </Button>
+          <Button type="primary" loading={submitLoading} block onClick={() => onFinish(form.getFieldsValue(), 'publish')}>
+            Publish
+          </Button>
+        </BtnWrapper>
       </Form>
-      <BtnWrapper>
-        <Button onClick={onReset} block>
-          Save to draft
-        </Button>
-        <Button type="primary" htmlType="submit" loading={submitLoading} block>
-          Publish
-        </Button>
-      </BtnWrapper>
     </Card>
   )
 }

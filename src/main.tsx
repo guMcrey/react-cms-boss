@@ -22,7 +22,7 @@ ReactDOM.render(
           <Route path="/" element={<Dashboard />}></Route>
           <Route path="articles" element={<ArticleList />}></Route>
           <Route path="article-create" element={<CreateArticle />}></Route>
-          <Route path="article-editor" element={<CreateArticleEditor />}></Route>
+          <Route path="article-create-editor" element={<CreateArticleEditor />}></Route>
           <Route path="article-analysis" element={<ArticleAnalysis />}></Route>
           <Route path="profile" element={<Profile />}></Route>
           <Route path="settings" element={<Settings />}></Route>

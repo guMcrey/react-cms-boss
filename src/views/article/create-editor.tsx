@@ -6,9 +6,12 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-react'
 import { Button, Card } from 'antd'
 import styled from 'styled-components'
 import { CreateArticle } from './create'
+import { debounce } from '@/utils/function'
 
 export const CreateArticleEditor = () => {
   const [editor, setEditor] = useState<IDomEditor | null>(null)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
 
   const defaultHtml = <DefaultHtmlStyle></DefaultHtmlStyle>
   const toolbarConfig: Partial<IToolbarConfig> = {
@@ -25,6 +28,14 @@ export const CreateArticleEditor = () => {
       i18nChangeLanguage('en')
       setEditor(editor)
     },
+    onChange: (editor) => {
+      const contentText = editor.getText()
+      setDescription(contentText)
+    },
+  }
+
+  const titleChangeHandler = (e: any) => {
+    setTitle(e.target.value)
   }
 
   useEffect(() => {
@@ -42,18 +53,18 @@ export const CreateArticleEditor = () => {
         <Toolbar editor={editor} defaultConfig={toolbarConfig} mode="default" style={{ margin: '0 1px' }}></Toolbar>
         <Card bordered={false}>
           <TitleWrapper>
-            <input placeholder="Please enter title"></input>
+            <input placeholder="Please enter title" onChange={debounce(titleChangeHandler)}></input>
           </TitleWrapper>
           <Editor
             defaultConfig={editorConfig}
             defaultHtml={`${defaultHtml}`}
             mode="default"
-            style={{ height: '723px', overflowY: 'hidden' }}
+            style={{ height: '637px', overflowY: 'hidden' }}
           ></Editor>
         </Card>
       </div>
-      <div style={{ width: 430, height: 'auto' }}>
-        <CreateArticle></CreateArticle>
+      <div style={{ width: 480, height: 'auto' }}>
+        <CreateArticle title={title} description={description}></CreateArticle>
       </div>
     </EditorWrapper>
   )

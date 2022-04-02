@@ -18,9 +18,9 @@ export const ArticleList = () => {
 
   const jumpToArticleForm = (item?: IArticleItem): void => {
     if (item && item.article_id) {
-      navigate(`/article-create?id=${item.article_id}`)
+      navigate(`/article-create-editor?id=${item.article_id}`)
     } else {
-      navigate(`/article-create`)
+      navigate(`/article-create-editor`)
     }
   }
 
