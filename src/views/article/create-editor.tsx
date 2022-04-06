@@ -7,11 +7,13 @@ import { Button, Card } from 'antd'
 import styled from 'styled-components'
 import { CreateArticle } from './create'
 import { debounce } from '@/utils/function'
+import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons'
 
 export const CreateArticleEditor = () => {
   const [editor, setEditor] = useState<IDomEditor | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [isShowVisible, setIsShowVisible] = useState(true)
 
   const defaultHtml = <DefaultHtmlStyle></DefaultHtmlStyle>
   const toolbarConfig: Partial<IToolbarConfig> = {
@@ -48,7 +50,7 @@ export const CreateArticleEditor = () => {
 
   return (
     <EditorWrapper>
-      <div>
+      <div style={{ flex: '1 1 auto', position: 'relative' }}>
         {/* TODO: change toolbar background-color */}
         <Toolbar editor={editor} defaultConfig={toolbarConfig} mode="default" style={{ margin: '0 1px' }}></Toolbar>
         <Card bordered={false}>
@@ -62,10 +64,24 @@ export const CreateArticleEditor = () => {
             style={{ height: '637px', overflowY: 'hidden' }}
           ></Editor>
         </Card>
+        <ExpandAndFoldWrapper onClick={() => setIsShowVisible(!isShowVisible)}>
+          {isShowVisible && (
+            <span className="expandBtn">
+              <DoubleRightOutlined style={{ color: '#4047f4' }} />
+            </span>
+          )}
+          {!isShowVisible && (
+            <span className="expandBtn">
+              <DoubleLeftOutlined style={{ color: '#4047f4' }} />
+            </span>
+          )}
+        </ExpandAndFoldWrapper>
       </div>
-      <div style={{ width: 480, height: 'auto' }}>
-        <CreateArticle title={title} description={description}></CreateArticle>
-      </div>
+      {isShowVisible && (
+        <div style={{ width: 480, height: 'auto' }}>
+          <CreateArticle title={title} description={description}></CreateArticle>
+        </div>
+      )}
     </EditorWrapper>
   )
 }
@@ -92,4 +108,20 @@ const TitleWrapper = styled.div`
 
 const DefaultHtmlStyle = styled.p`
   font-size: 14px;
+`
+
+const ExpandAndFoldWrapper = styled.div`
+  .expandBtn {
+    text-align: center;
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 100%;
+    position: absolute;
+    top: 40px;
+    right: -18px;
+    background-color: #fff;
+    box-shadow: 0 1px 10px 0 rgb(64 71 244 / 30%);
+    z-index: 3;
+  }
 `
