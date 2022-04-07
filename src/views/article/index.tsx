@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Button, Card, DatePicker, Form, Input, message, Popconfirm, Select, Space, Table } from 'antd'
+import { Button, Card, DatePicker, Form, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { useGetArticles, deleteArticle } from '@/apis/article'
+import { useGetTags } from '@/apis/tag'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 
 import { IArticleItem, IArticleQuery } from '@/interfaces/article'
@@ -15,6 +16,7 @@ export const ArticleList = () => {
   const [form] = Form.useForm()
   const navigate = useNavigate()
   const { articleList, isLoading, mutate } = useGetArticles(query)
+  const { tagList, isTagLoading, mutateTag } = useGetTags()
 
   const jumpToArticleForm = (item?: IArticleItem): void => {
     if (item && item.article_id) {
@@ -37,6 +39,10 @@ export const ArticleList = () => {
     setQuery(form.getFieldsValue())
   }
 
+  const handleTagChange = (selectedItems: string[]) => {
+    console.log(selectedItems)
+  }
+
   return (
     <Card
       title="Article List"
@@ -55,17 +61,26 @@ export const ArticleList = () => {
         </Form.Item>
         <Form.Item name="publish_status">
           <Select placeholder="Publish Status" style={{ width: 200 }} onChange={debounce(onChangeQuery, 1000)}>
-            <Option value="published">Published</Option>
-            <Option value="un_published">UnPublished</Option>
+            <Option value="publish">Published</Option>
+            <Option value="saveToDraft">Draft</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="tag">
+          <Select maxTagCount={2} mode="multiple" allowClear placeholder="Tag" style={{ width: 240 }} onChange={handleTagChange}>
+            {tagList && tagList.map((_: any) => <Option key={_.tag_name} value={_.tag_name} children={undefined}></Option>)}
           </Select>
         </Form.Item>
       </Form>
       <Table loading={isLoading} dataSource={articleList} rowKey="article_id">
         <Column title="Title" dataIndex="title"></Column>
         <Column title="Author" dataIndex="author"></Column>
-        <Column title="URL" dataIndex="url"></Column>
+        <Column title="Slug" dataIndex="url"></Column>
         <Column title="Description" dataIndex="description"></Column>
-        <Column title="Tag" dataIndex="tag"></Column>
+        <Column
+          title="Tag"
+          dataIndex="tag"
+          render={(record) => record.map((_: string) => <Tag color="geekblue">{_}</Tag>)}
+        ></Column>
         <Column title="Publish Time" dataIndex="publish_time"></Column>
         <Column title="Publish Status" dataIndex="publish_status"></Column>
         <Column
