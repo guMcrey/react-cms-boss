@@ -3,13 +3,15 @@ import { Button, Card, DatePicker, Form, Input, message, Popconfirm, Select, Spa
 import { useNavigate } from 'react-router-dom'
 import { useGetArticles, deleteArticle } from '@/apis/article'
 import { useGetTags } from '@/apis/tag'
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { EditOutlined, DeleteOutlined, PlusOutlined, CheckCircleTwoTone, StarTwoTone } from '@ant-design/icons'
 
 import { IArticleItem, IArticleQuery } from '@/interfaces/article'
 import { debounce } from '@/utils/function'
+import moment from 'moment'
 
 const { Column } = Table
 const { Option } = Select
+const { RangePicker } = DatePicker
 
 export const ArticleList = () => {
   const [query, setQuery] = useState<IArticleQuery | undefined>()
@@ -36,11 +38,15 @@ export const ArticleList = () => {
   }
 
   const onChangeQuery = () => {
-    setQuery(form.getFieldsValue())
-  }
-
-  const handleTagChange = (selectedItems: string[]) => {
-    console.log(selectedItems)
+    const { title, publish_status, tag, publish_time } = form.getFieldsValue()
+    const body = {
+      title,
+      publish_status,
+      publish_time_start: publish_time && moment(publish_time[0]).startOf('date').format('YYYY-MM-DD HH:mm:ss'),
+      publish_time_end: publish_time && moment(publish_time[1]).endOf('date').format('YYYY-MM-DD HH:mm:ss'),
+      tag: tag && tag.length ? tag.join(',') : undefined,
+    }
+    setQuery(body)
   }
 
   return (
@@ -54,19 +60,30 @@ export const ArticleList = () => {
     >
       <Form form={form} layout="inline" style={{ marginBottom: 15 }}>
         <Form.Item name="title">
-          <Input placeholder="Title" style={{ width: 200 }} onChange={debounce(onChangeQuery, 1000)} />
+          <Input placeholder="Title" style={{ width: 200 }} onChange={debounce(onChangeQuery)} />
         </Form.Item>
         <Form.Item name="publish_time">
-          <DatePicker style={{ width: 200 }} onChange={debounce(onChangeQuery, 1000)}></DatePicker>
+          <RangePicker
+            placeholder={['Publish Time Start', 'Publish Time End']}
+            style={{ width: 320 }}
+            onChange={debounce(onChangeQuery, 1000)}
+          ></RangePicker>
         </Form.Item>
         <Form.Item name="publish_status">
-          <Select placeholder="Publish Status" style={{ width: 200 }} onChange={debounce(onChangeQuery, 1000)}>
+          <Select placeholder="Publish Status" style={{ width: 200 }} allowClear onChange={debounce(onChangeQuery)}>
             <Option value="publish">Published</Option>
             <Option value="saveToDraft">Draft</Option>
           </Select>
         </Form.Item>
         <Form.Item name="tag">
-          <Select maxTagCount={2} mode="multiple" allowClear placeholder="Tag" style={{ width: 240 }} onChange={handleTagChange}>
+          <Select
+            maxTagCount={2}
+            mode="multiple"
+            allowClear
+            placeholder="Tag"
+            style={{ width: 240 }}
+            onChange={debounce(onChangeQuery)}
+          >
             {tagList && tagList.map((_: any) => <Option key={_.tag_name} value={_.tag_name} children={undefined}></Option>)}
           </Select>
         </Form.Item>
@@ -82,7 +99,28 @@ export const ArticleList = () => {
           render={(record) => record.map((_: string) => <Tag color="geekblue">{_}</Tag>)}
         ></Column>
         <Column title="Publish Time" dataIndex="publish_time"></Column>
-        <Column title="Publish Status" dataIndex="publish_status"></Column>
+        <Column
+          title="Publish Status"
+          dataIndex="publish_status"
+          render={(record) => {
+            return (
+              <>
+                {record === 'publish' && (
+                  <>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                    <span> Published </span>
+                  </>
+                )}
+                {record === 'saveToDraft' && (
+                  <>
+                    <StarTwoTone />
+                    <span> Draft </span>
+                  </>
+                )}
+              </>
+            )
+          }}
+        ></Column>
         <Column
           title="Action"
           key="action"
