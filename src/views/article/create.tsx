@@ -102,6 +102,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
       <Tag
         closable
         color="geekblue"
+        style={{ marginBottom: 8 }}
         onClose={(e) => {
           e.preventDefault()
           handleTagClose(tag)
@@ -165,9 +166,9 @@ export const CreateArticle = (props: Partial<IProps>) => {
   }
 
   useEffect(() => {
-    if (articleInfo && articleInfo.length) {
-      const { title, author, url, main_img, description, content, publish_time, tag } = articleInfo[0]
-      props.getEditInfo && props.getEditInfo(articleInfo[0])
+    if (articleInfo) {
+      const { title, author, url, main_img, description, content, publish_time, tag } = articleInfo
+      props.getEditInfo && props.getEditInfo(articleInfo)
       form.setFieldsValue({
         title,
         url,
@@ -178,6 +179,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
         publishTime: moment(publish_time),
         tag,
       })
+      setTags(tag)
     }
   }, [articleInfo])
 
