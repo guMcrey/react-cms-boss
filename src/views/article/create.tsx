@@ -16,6 +16,8 @@ const { Option } = Select
 interface IProps {
   title: string
   description: string
+  content: string
+  getEditInfo: Function
 }
 
 export const CreateArticle = (props: Partial<IProps>) => {
@@ -115,12 +117,12 @@ export const CreateArticle = (props: Partial<IProps>) => {
   const tagChild = tags.map(forMap)
 
   const onFinish = async (values: IArticleCreate, publishType: string) => {
-    const { title, url, content, description, publishTime } = values
+    const { title, url, description, publishTime } = values
     const body = {
       title,
       url,
       author: username,
-      content,
+      content: props.content,
       description,
       mainPicture: fileList,
       publishStatus: publishType,
@@ -164,7 +166,8 @@ export const CreateArticle = (props: Partial<IProps>) => {
 
   useEffect(() => {
     if (articleInfo && articleInfo.length) {
-      const { title, author, url, main_img, description, content, publish_time, publish_status, tag } = articleInfo[0]
+      const { title, author, url, main_img, description, content, publish_time, tag } = articleInfo[0]
+      props.getEditInfo && props.getEditInfo(articleInfo[0])
       form.setFieldsValue({
         title,
         url,
@@ -172,8 +175,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
         mainPicture: main_img,
         description,
         content,
-        // publishTime: publish_time,
-        // publishStatus: publish_status,
+        publishTime: moment(publish_time),
         tag,
       })
     }

@@ -92,13 +92,20 @@ export const ArticleList = () => {
         <Column title="Title" dataIndex="title"></Column>
         <Column title="Author" dataIndex="author"></Column>
         <Column title="Slug" dataIndex="url"></Column>
-        <Column title="Description" dataIndex="description"></Column>
+        <Column title="Description" width={180} dataIndex="description" ellipsis></Column>
         <Column
           title="Tag"
           dataIndex="tag"
-          render={(record) => record.map((_: string) => <Tag color="geekblue">{_}</Tag>)}
+          ellipsis
+          render={(record) =>
+            record.map((_: string) => (
+              <Tag style={{ marginBottom: 3 }} color="geekblue">
+                {_}
+              </Tag>
+            ))
+          }
         ></Column>
-        <Column title="Publish Time" dataIndex="publish_time"></Column>
+        <Column width={180} title="Publish Time" dataIndex="publish_time"></Column>
         <Column
           title="Publish Status"
           dataIndex="publish_status"
@@ -124,6 +131,7 @@ export const ArticleList = () => {
         <Column
           title="Action"
           key="action"
+          width={110}
           render={(record) => (
             <Space size="small">
               <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={() => jumpToArticleForm(record)} />

@@ -13,9 +13,10 @@ export const CreateArticleEditor = () => {
   const [editor, setEditor] = useState<IDomEditor | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [content, setContent] = useState('')
   const [isShowVisible, setIsShowVisible] = useState(true)
+  const [defaultHtml, setDefaultHtml] = useState(<DefaultHtmlStyle></DefaultHtmlStyle>)
 
-  const defaultHtml = <DefaultHtmlStyle></DefaultHtmlStyle>
   const toolbarConfig: Partial<IToolbarConfig> = {
     excludeKeys: ['fullScreen'],
   }
@@ -32,13 +33,25 @@ export const CreateArticleEditor = () => {
     },
     onChange: (editor) => {
       const contentText = editor.getText()
+      const contentHtml = editor.getHtml()
       setDescription(contentText)
+      setContent(contentHtml)
     },
   }
 
   const titleChangeHandler = (e: any) => {
     setTitle(e.target.value)
   }
+
+  const getEditInfo = async (data: any) => {
+    await setTitle(data.title)
+    await setContent(data.content)
+    await setDefaultHtml(data.content)
+  }
+
+  useEffect(() => {
+    setDefaultHtml(content as any)
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -50,20 +63,27 @@ export const CreateArticleEditor = () => {
 
   return (
     <EditorWrapper>
-      <div style={{ flex: '1 1 auto', position: 'relative' }}>
-        {/* TODO: change toolbar background-color */}
+      <Card bordered={false} style={{ flex: '1 1 auto', position: 'relative' }}>
         <Toolbar editor={editor} defaultConfig={toolbarConfig} mode="default" style={{ margin: '0 1px' }}></Toolbar>
-        <Card bordered={false}>
-          <TitleWrapper>
-            <input placeholder="Please enter title" onChange={debounce(titleChangeHandler)}></input>
-          </TitleWrapper>
+        <TitleWrapper>
+          <input placeholder="Please enter title" value={title} onChange={debounce(titleChangeHandler)}></input>
+        </TitleWrapper>
+        {defaultHtml && (
           <Editor
             defaultConfig={editorConfig}
             defaultHtml={`${defaultHtml}`}
             mode="default"
             style={{ height: '637px', overflowY: 'hidden' }}
           ></Editor>
-        </Card>
+        )}
+        {!defaultHtml && (
+          <Editor
+            defaultConfig={editorConfig}
+            defaultHtml={`${defaultHtml}`}
+            mode="default"
+            style={{ height: '637px', overflowY: 'hidden' }}
+          ></Editor>
+        )}
         <ExpandAndFoldWrapper onClick={() => setIsShowVisible(!isShowVisible)}>
           {isShowVisible && (
             <span className="expandBtn">
@@ -76,10 +96,10 @@ export const CreateArticleEditor = () => {
             </span>
           )}
         </ExpandAndFoldWrapper>
-      </div>
+      </Card>
       {isShowVisible && (
-        <div style={{ width: 480, height: 'auto' }}>
-          <CreateArticle title={title} description={description}></CreateArticle>
+        <div style={{ width: 500, overflow: 'hidden', height: 'auto' }}>
+          <CreateArticle title={title} description={description} content={content} getEditInfo={getEditInfo}></CreateArticle>
         </div>
       )}
     </EditorWrapper>
