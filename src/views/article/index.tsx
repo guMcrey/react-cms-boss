@@ -98,8 +98,8 @@ export const ArticleList = () => {
           dataIndex="tag"
           ellipsis
           render={(record) =>
-            record.map((_: string) => (
-              <Tag style={{ marginBottom: 3 }} color="geekblue">
+            record.map((_: string, index: number) => (
+              <Tag key={index} style={{ marginBottom: 3 }} color="geekblue">
                 {_}
               </Tag>
             ))

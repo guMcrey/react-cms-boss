@@ -13,12 +13,12 @@ export function convertToUrl(value: string) {
   // chinese
   if (regExp.test(finalValueChar)) {
     finalValueChar = pinyin.convertToPinyin(finalValueChar)
-    console.log('finalValueChar', finalValueChar)
   }
   return finalValueChar.toLocaleLowerCase().split(' ').join('-')
 }
 
 // debounce: wait 1s
+// TODO: bug
 export function debounce<Params extends any[]>(func: (...args: Params) => any, delay = 1000): (...args: Params) => void {
   let timer: NodeJS.Timeout
   return (...args: Params) => {

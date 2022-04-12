@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import '@wangeditor/editor/dist/css/style.css'
 import { IDomEditor, IEditorConfig, IToolbarConfig, i18nChangeLanguage } from '@wangeditor/editor'
 import { Editor, Toolbar } from '@wangeditor/editor-for-react'
-import { Button, Card } from 'antd'
+import { Card } from 'antd'
 import styled from 'styled-components'
 import { CreateArticle } from './create'
 import { debounce } from '@/utils/function'
@@ -66,7 +66,7 @@ export const CreateArticleEditor = () => {
       <Card bordered={false} style={{ flex: '1 1 auto', position: 'relative' }}>
         <Toolbar editor={editor} defaultConfig={toolbarConfig} mode="default" style={{ margin: '0 1px' }}></Toolbar>
         <TitleWrapper>
-          <input placeholder="Please enter title" value={title} onChange={debounce(titleChangeHandler)}></input>
+          <input type="text" placeholder="Please enter title" value={title} onChange={titleChangeHandler}></input>
         </TitleWrapper>
         {defaultHtml && (
           <Editor

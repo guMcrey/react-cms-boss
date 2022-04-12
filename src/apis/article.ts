@@ -60,7 +60,6 @@ export const updateArticle = async (id: string, form: IArticleCreate) => {
       url,
       content,
       description,
-      main_img: mainPicture,
       publish_status: publishStatus,
       publish_time: publishTime,
       tag,

@@ -47,10 +47,11 @@ export const CreateArticle = (props: Partial<IProps>) => {
     onRemove: (file: never) => {
       return setFileList(null)
     },
-    beforeUpload: (file: never) => {
-      setFileList(file)
+    beforeUpload: (file: any) => {
+      setFileList([file])
       return false
     },
+    fileList,
   }
 
   const handleEditAuthor = () => {
@@ -135,22 +136,35 @@ export const CreateArticle = (props: Partial<IProps>) => {
     // edit
     if (currentId) {
       const result = await updateArticle(currentId, body)
+
+      // 更新 main img
+      if (fileList.length) {
+        const formDataBody = new FormData()
+        formDataBody.append('main_img', fileList[0])
+        const uploadResult = await uploadArticleMainPicture(result.articleId, formDataBody)
+        if (uploadResult.code !== 200) {
+          message.error('Create failed')
+          return
+        }
+      }
+
       if (result !== undefined) {
         message.success('Update success')
         navigate('/articles')
       }
       return
     }
+
     // create
     if (!currentId) {
       const result = await createArticle(body)
 
       // 上传 main img
-      if (fileList) {
+      if (fileList.length) {
         const formDataBody = new FormData()
-        formDataBody.append('main_img', fileList)
+        formDataBody.append('main_img', fileList[0])
         const uploadResult = await uploadArticleMainPicture(result.articleId, formDataBody)
-        if (!uploadResult.filename) {
+        if (uploadResult.code !== 200) {
           message.error('Create failed')
           return
         }
@@ -163,6 +177,13 @@ export const CreateArticle = (props: Partial<IProps>) => {
       return
     }
     setSubmitLoading(false)
+  }
+
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e
+    }
+    return e && e.fileList
   }
 
   useEffect(() => {
@@ -179,6 +200,15 @@ export const CreateArticle = (props: Partial<IProps>) => {
         publishTime: moment(publish_time),
         tag,
       })
+      setFileList([
+        {
+          uid: '1',
+          name: `${main_img}`,
+          type: 'image/png',
+          url: `http://localhost:3000/images/${main_img}`,
+          thumbUrl: `http://localhost:3000/images/${main_img}`,
+        },
+      ])
       setTags(tag)
     }
   }, [articleInfo])
@@ -266,11 +296,20 @@ export const CreateArticle = (props: Partial<IProps>) => {
             </ToolTipsWrapper>
           )}
         </Form.Item>
-        <Form.Item label="Main Picture">
-          <Upload listType="picture" {...mainPictureProps} maxCount={1}>
-            <Button icon={<UploadOutlined />}>Select main picture</Button>
-          </Upload>
-        </Form.Item>
+        {fileList && (
+          <Form.Item label="Main Picture" getValueFromEvent={normFile}>
+            <Upload listType="picture" {...mainPictureProps} maxCount={1}>
+              <Button icon={<UploadOutlined />}>Select main picture</Button>
+            </Upload>
+          </Form.Item>
+        )}
+        {!fileList && (
+          <Form.Item label="Main Picture" valuePropName="fileList" getValueFromEvent={normFile}>
+            <Upload listType="picture" {...mainPictureProps} maxCount={1}>
+              <Button icon={<UploadOutlined />}>Select main picture</Button>
+            </Upload>
+          </Form.Item>
+        )}
         <Form.Item label="Description" name="description">
           <TextArea showCount maxLength={300} rows={3} placeholder="Please enter article description..." />
         </Form.Item>
