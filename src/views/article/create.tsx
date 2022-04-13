@@ -82,7 +82,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
   }
 
   const handleInputChange = (e: any) => {
-    setTagInputValue(e.target.value)
+    setTagInputValue(e.target.value && e.target.value.trim())
   }
 
   const handleInputConfirm = () => {
@@ -121,11 +121,11 @@ export const CreateArticle = (props: Partial<IProps>) => {
   const onFinish = async (values: IArticleCreate, publishType: string) => {
     const { title, url, description, publishTime } = values
     const body = {
-      title,
-      url,
-      author: username,
-      content: props.content,
-      description,
+      title: title.trim(),
+      url: title.trim(),
+      author: username.trim(),
+      content: props.content && props.content.trim(),
+      description: description && description.trim(),
       mainPicture: fileList,
       publishStatus: publishType,
       publishTime: moment(publishTime).format('YYYY-MM-DD HH:mm:ss'),
@@ -138,7 +138,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
       const result = await updateArticle(currentId, body)
 
       // 更新 main img
-      if (fileList.length) {
+      if (fileList && fileList.length) {
         const formDataBody = new FormData()
         formDataBody.append('main_img', fileList[0])
         const uploadResult = await uploadArticleMainPicture(result.articleId, formDataBody)
@@ -160,7 +160,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
       const result = await createArticle(body)
 
       // 上传 main img
-      if (fileList.length) {
+      if (fileList && fileList.length) {
         const formDataBody = new FormData()
         formDataBody.append('main_img', fileList[0])
         const uploadResult = await uploadArticleMainPicture(result.articleId, formDataBody)
@@ -319,7 +319,13 @@ export const CreateArticle = (props: Partial<IProps>) => {
         <Form.Item label="Tag">
           {tagChild}
           {tagInputVisible && (
-            <Input style={{ width: 100 }} type="text" onChange={handleInputChange} onPressEnter={handleInputConfirm} />
+            <Input
+              style={{ width: 100 }}
+              type="text"
+              onChange={handleInputChange}
+              onBlur={handleInputConfirm}
+              onPressEnter={handleInputConfirm}
+            />
           )}
           {!tagInputVisible && (
             <Tag color="#4047F4" onClick={() => setTagInputVisible(true)}>
