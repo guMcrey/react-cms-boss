@@ -200,15 +200,17 @@ export const CreateArticle = (props: Partial<IProps>) => {
         publishTime: moment(publish_time),
         tag,
       })
-      setFileList([
-        {
-          uid: '1',
-          name: `${main_img}`,
-          type: 'image/png',
-          url: `http://localhost:3000/images/${main_img}`,
-          thumbUrl: `http://localhost:3000/images/${main_img}`,
-        },
-      ])
+      if (main_img) {
+        setFileList([
+          {
+            uid: '1',
+            name: `${main_img}`,
+            type: 'image/png',
+            url: `http://localhost:3000/images/${main_img}`,
+            thumbUrl: `http://localhost:3000/images/${main_img}`,
+          },
+        ])
+      }
       setTags(tag)
     }
   }, [articleInfo])
@@ -297,7 +299,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
           )}
         </Form.Item>
         {fileList && (
-          <Form.Item label="Main Picture" getValueFromEvent={normFile}>
+          <Form.Item label="Main Picture" valuePropName="fileList" getValueFromEvent={normFile}>
             <Upload listType="picture" {...mainPictureProps} maxCount={1}>
               <Button icon={<UploadOutlined />}>Select main picture</Button>
             </Upload>

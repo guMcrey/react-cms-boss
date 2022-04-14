@@ -16,15 +16,38 @@ export const CreateArticleEditor = () => {
   const [content, setContent] = useState('')
   const [isShowVisible, setIsShowVisible] = useState(true)
   const [defaultHtml, setDefaultHtml] = useState(<DefaultHtmlStyle></DefaultHtmlStyle>)
+  const [contentFile, setContentFile]: any = useState([])
 
   const toolbarConfig: Partial<IToolbarConfig> = {
     excludeKeys: ['fullScreen'],
   }
+
+  const customCheckLinkFn = (url: string): undefined | string | boolean => {
+    if (!url) {
+      return
+    }
+    if (!url.includes('http')) {
+      return 'Links must start with http/https'
+    }
+    return true
+  }
+
   const editorConfig: Partial<IEditorConfig> = {
     placeholder: 'Please enter...',
     MENU_CONF: {
       fontSize: {
         fontSizeList: ['16px', '18px', '22px'],
+      },
+      insertLink: {
+        checkLink: customCheckLinkFn,
+      },
+      uploadImage: {
+        server: '/api/upload/article-content-img',
+        // TODO: 获取上传后删除的图片
+        onBeforeUpload: (file: any) => {
+          setContentFile([...contentFile, file])
+          console.log('---', contentFile)
+        },
       },
     },
     onCreated: (editor) => {
