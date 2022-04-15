@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { CreateArticle } from './create'
 import { debounce } from '@/utils/function'
 import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons'
+import { ImageElement, VideoElement } from './wangEditor'
 
 export const CreateArticleEditor = () => {
   const [editor, setEditor] = useState<IDomEditor | null>(null)
@@ -16,13 +17,16 @@ export const CreateArticleEditor = () => {
   const [content, setContent] = useState('')
   const [isShowVisible, setIsShowVisible] = useState(true)
   const [defaultHtml, setDefaultHtml] = useState(<DefaultHtmlStyle></DefaultHtmlStyle>)
-  const [contentFile, setContentFile]: any = useState([])
+  const [insertedImgList, setInsertedImgList] = useState<string[]>([])
+  const [insertedVideoList, setInsertedVideoList] = useState<string[]>([])
+  const insertedImgStorage: string[] = []
+  const insertedVideoStorage: string[] = []
 
   const toolbarConfig: Partial<IToolbarConfig> = {
     excludeKeys: ['fullScreen'],
   }
 
-  const customCheckLinkFn = (url: string): undefined | string | boolean => {
+  const customCheckLinkFn = (text: string, url: string): undefined | string | boolean => {
     if (!url) {
       return
     }
@@ -43,10 +47,25 @@ export const CreateArticleEditor = () => {
       },
       uploadImage: {
         server: '/api/upload/article-content-img',
-        // TODO: 获取上传后删除的图片
-        onBeforeUpload: (file: any) => {
-          setContentFile([...contentFile, file])
-          console.log('---', contentFile)
+      },
+      insertImage: {
+        onInsertedImage: async (imageNode: ImageElement | null) => {
+          if (imageNode === null) return
+          const { src } = imageNode
+          insertedImgStorage.push(src)
+          await setInsertedImgList([...insertedImgStorage])
+        },
+      },
+      uploadVideo: {
+        server: '/api/upload/article-content-video',
+      },
+      insertVideo: {
+        // TODO: video deference
+        onInsertedVideo: async (videoNode: VideoElement | null) => {
+          if (videoNode === null) return
+          const { src } = videoNode
+          insertedVideoStorage.push(src)
+          await setInsertedVideoList([...insertedVideoStorage])
         },
       },
     },
@@ -79,8 +98,8 @@ export const CreateArticleEditor = () => {
   useEffect(() => {
     return () => {
       if (editor === null) return
-      editor.destroy()
       setEditor(null)
+      editor.destroy()
     }
   }, [editor])
 
@@ -121,8 +140,17 @@ export const CreateArticleEditor = () => {
         </ExpandAndFoldWrapper>
       </Card>
       {isShowVisible && (
-        <div style={{ width: 500, overflow: 'hidden', height: 'auto' }}>
-          <CreateArticle title={title} description={description} content={content} getEditInfo={getEditInfo}></CreateArticle>
+        <div style={{ minWidth: 400, overflow: 'hidden', height: 'auto' }}>
+          <CreateArticle
+            title={title}
+            description={description}
+            content={content}
+            insertedImgList={insertedImgList}
+            insertedVideoList={insertedVideoList}
+            finallyImgList={editor && editor.getElemsByType('image')}
+            finallyVideoList={editor && editor.getElemsByType('video')}
+            getEditInfo={getEditInfo}
+          ></CreateArticle>
         </div>
       )}
     </EditorWrapper>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card, DatePicker, Form, Input, message, Radio, Select, Space, Tag, Tooltip, Upload } from 'antd'
 import { createArticle, uploadArticleMainPicture } from '@/apis/article'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useGetArticleDetailById, updateArticle } from '@/apis/article'
+import { useGetArticleDetailById, updateArticle, deleteContentImages } from '@/apis/article'
 import { IArticleCreate } from '@/interfaces/article'
 import { EditOutlined, CheckOutlined, UploadOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
@@ -17,6 +17,10 @@ interface IProps {
   title: string
   description: string
   content: string
+  insertedImgList: string[]
+  insertedVideoList: string[]
+  finallyImgList: any[] | null
+  finallyVideoList: any[] | null
   getEditInfo: Function
 }
 
@@ -36,7 +40,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
   const [form] = Form.useForm()
   let [params] = useSearchParams()
   const currentId = params.get('id')
-  const { articleInfo, isLoading } = useGetArticleDetailById(currentId)
+  const { articleInfo, fetchData } = useGetArticleDetailById(currentId)
 
   const slugOptions = [
     { label: 'Automatic generate', value: 'automatic' },
@@ -119,10 +123,19 @@ export const CreateArticle = (props: Partial<IProps>) => {
   const tagChild = tags.map(forMap)
 
   const onFinish = async (values: IArticleCreate, publishType: string) => {
+    // 获取 insertedImgList 和 finallyImgList 差集
+    let insertImg = props.insertedImgList && new Set([...props.insertedImgList])
+    let finalImg = props.finallyImgList && new Set([...props.finallyImgList.map((val) => val.src)])
+    const difference = insertImg && new Set([...insertImg].filter((val) => finalImg && !finalImg.has(val)))
+    const deleteResult = difference && (await deleteContentImages([...difference]))
+    if (deleteResult.code !== 200) {
+      message.error(`${deleteResult.message}`)
+    }
+
     const { title, url, description, publishTime } = values
     const body = {
       title: title.trim(),
-      url: title.trim(),
+      url: url && url.trim(),
       author: username.trim(),
       content: props.content && props.content.trim(),
       description: description && description.trim(),
@@ -187,32 +200,33 @@ export const CreateArticle = (props: Partial<IProps>) => {
   }
 
   useEffect(() => {
-    if (articleInfo) {
-      const { title, author, url, main_img, description, content, publish_time, tag } = articleInfo
-      props.getEditInfo && props.getEditInfo(articleInfo)
-      form.setFieldsValue({
-        title,
-        url,
-        author,
-        mainPicture: main_img,
-        description,
-        content,
-        publishTime: moment(publish_time),
-        tag,
-      })
-      if (main_img) {
-        setFileList([
-          {
-            uid: '1',
-            name: `${main_img}`,
-            type: 'image/png',
-            url: `http://localhost:3000/images/${main_img}`,
-            thumbUrl: `http://localhost:3000/images/${main_img}`,
-          },
-        ])
-      }
-      setTags(tag)
+    if (!articleInfo) {
+      return
     }
+    const { title, author, url, main_img, description, content, publish_time, tag } = articleInfo
+    props.getEditInfo && props.getEditInfo(articleInfo)
+    form.setFieldsValue({
+      title,
+      url,
+      author,
+      mainPicture: main_img,
+      description,
+      content,
+      publishTime: moment(publish_time),
+      tag,
+    })
+    if (main_img) {
+      setFileList([
+        {
+          uid: '1',
+          name: `${main_img}`,
+          type: 'image/png',
+          url: `http://localhost:3000/images/${main_img}`,
+          thumbUrl: `http://localhost:3000/images/${main_img}`,
+        },
+      ])
+    }
+    setTags(tag)
   }, [articleInfo])
 
   useEffect(() => {
@@ -228,6 +242,10 @@ export const CreateArticle = (props: Partial<IProps>) => {
       description: descriptionDisplay,
     })
   }, [props.description])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
     <Card title="Variables">

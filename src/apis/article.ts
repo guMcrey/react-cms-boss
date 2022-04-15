@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { axios } from '@/utils/axios'
 import { IArticleCreate, IArticleQuery } from '@/interfaces/article'
+import { useState } from 'react'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 const queryFetcher = (url: string, query?: IArticleQuery) => axios.get(url, { params: query }).then((data) => data.data)
@@ -18,12 +19,22 @@ export const useGetArticles = (query?: IArticleQuery) => {
 
 // get article by id
 export const useGetArticleDetailById = (id?: string | null) => {
-  const { data, error } = useSWR(id ? `/api/articles/${id}` : null, fetcher)
+  const [data, setData] = useState(undefined)
+  const fetchData = async () => {
+    try {
+      if (!id) {
+        return
+      }
+      const { data } = await axios.get(`/articles/${id}`)
+      setData(data.result)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 
   return {
-    articleInfo: data && data.result,
-    isLoading: !error && !data,
-    isError: error,
+    articleInfo: data,
+    fetchData,
   }
 }
 
@@ -99,4 +110,18 @@ export const uploadArticleMainPicture = async (articleId: string, img: FormData)
   }
 
   return uploadResult
+}
+
+// delete article content images
+export const deleteContentImages = async (images: string[]) => {
+  let deleteResult = undefined
+  try {
+    const { data } = await axios.patch(`/upload/article-content-img`, {
+      delete_images: images,
+    })
+    deleteResult = data
+  } catch (e) {
+    console.warn(e)
+  }
+  return deleteResult
 }
