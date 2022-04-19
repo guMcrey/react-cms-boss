@@ -34,6 +34,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
   const [tags, setTags] = useState([])
   const [tagInputValue, setTagInputValue] = useState(undefined)
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [publishStatus, setPublishStatus] = useState('publish')
 
   const navigate = useNavigate()
   const { TextArea } = Input
@@ -122,7 +123,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
 
   const tagChild = tags.map(forMap)
 
-  const onFinish = async (values: IArticleCreate, publishType: string) => {
+  const onFinish = async (values: IArticleCreate) => {
     // 获取 insertedImgList 和 finallyImgList 差集
     let insertImg = props.insertedImgList && new Set([...props.insertedImgList])
     let finalImg = props.finallyImgList && new Set([...props.finallyImgList.map((val) => val.src)])
@@ -140,7 +141,7 @@ export const CreateArticle = (props: Partial<IProps>) => {
       content: props.content && props.content.trim(),
       description: description && description.trim(),
       mainPicture: fileList,
-      publishStatus: publishType,
+      publishStatus,
       publishTime: moment(publishTime).format('YYYY-MM-DD HH:mm:ss'),
       tag: tags,
     }
@@ -249,7 +250,12 @@ export const CreateArticle = (props: Partial<IProps>) => {
 
   return (
     <Card title="Variables">
-      <Form layout="vertical" initialValues={{ publishTime: moment(new Date(), 'YYYY-MM-DD HH:mm:ss') }} form={form}>
+      <Form
+        layout="vertical"
+        initialValues={{ publishTime: moment(new Date(), 'YYYY-MM-DD HH:mm:ss') }}
+        form={form}
+        onFinish={(values) => onFinish(values)}
+      >
         <Form.Item label="Title:" name="title" rules={[{ required: true }]}>
           <Input placeholder="e.g. HTML Basic" readOnly />
         </Form.Item>
@@ -284,10 +290,10 @@ export const CreateArticle = (props: Partial<IProps>) => {
             style={{ width: 'calc(100% - 34px)', position: 'relative' }}
             rules={[
               {
-                validator: (rule, value, callback) => {
+                validator: async (rule, value, callback) => {
                   const regExp = new RegExp('^[A-Za-z0-9-]+$')
                   if (!regExp.test(value)) {
-                    callback('Only letters, numbers and dashes are allowed')
+                    await callback('Only letters, numbers and dashes are allowed')
                   }
                 },
               },
@@ -355,10 +361,10 @@ export const CreateArticle = (props: Partial<IProps>) => {
           )}
         </Form.Item>
         <BtnWrapper>
-          <Button onClick={() => onFinish(form.getFieldsValue(), 'saveToDraft')} block>
+          <Button htmlType="submit" block onClick={() => setPublishStatus('saveToDraft')}>
             Save to draft
           </Button>
-          <Button type="primary" loading={submitLoading} block onClick={() => onFinish(form.getFieldsValue(), 'publish')}>
+          <Button type="primary" htmlType="submit" loading={submitLoading} block>
             Publish
           </Button>
         </BtnWrapper>
