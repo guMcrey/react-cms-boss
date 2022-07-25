@@ -9,9 +9,18 @@ const { SubMenu } = Menu
 export const Sidebar = (props: { collapsed: boolean }) => {
   return (
     <Sider className="side-bar" trigger={null} collapsible collapsed={props.collapsed}>
-      <div className="logo-wrapper">
-        <img src="src/assets/images/svg-icons/cms-logo.svg" alt="logo" />
-      </div>
+      <>
+        {!props.collapsed && (
+          <div className="logo-wrapper">
+            <img src="src/assets/images/cms-logo.png" alt="logo" />
+          </div>
+        )}
+        {props.collapsed && (
+          <div className="logo-wrapper-small">
+            <img src="src/assets/images/cms-logo-small.png" alt="logo" />
+          </div>
+        )}
+      </>
       <Menu className="menu-area" defaultSelectedKeys={['dashboard']} mode="inline" theme="light">
         <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
           <Link to="/">Dashboard</Link>

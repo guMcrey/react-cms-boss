@@ -40,9 +40,17 @@ const LayoutWrapper = styled.div`
     margin-top: 8px;
   }
   .logo-wrapper {
-    margin: 5px auto;
-    width: 47px;
-    height: 47px;
+    padding: 0 27px;
+    margin-bottom: 13px;
+    img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  }
+  .logo-wrapper-small {
+    padding: 0 25px;
+    height: 40px;
+    margin-top: 10px;
     img {
       max-width: 100%;
       max-height: 100%;
@@ -84,9 +92,5 @@ const LayoutWrapper = styled.div`
   .layout-wrapper-container {
     background-color: #fff;
     border-radius: 0 25px 25px 0;
-  }
-  .wrapper-title {
-    font-size: 22px;
-    font-weight: bold;
   }
 `
